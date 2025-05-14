@@ -1,0 +1,31 @@
+/* Estilo base para las tarjetas */
+.card {
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.3s ease-in-out;
+}
+
+/* La descripción detallada está oculta por defecto */
+.detalle {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: rgba(0, 0, 0, 0.7); /* Fondo oscuro transparente */
+    color: white;
+    padding: 20px;
+    transform: translateY(100%);
+    transition: transform 0.3s ease-in-out;
+    height: 50%;
+    text-align: left;
+}
+
+/* Cuando el ratón pasa por encima de la tarjeta, la descripción aparece */
+.card:hover .detalle {
+    transform: translateY(0);
+}
+
+/* Efecto de zoom o ampliación de la tarjeta al pasar el ratón */
+.card:hover {
+    transform: scale(1.05);
+}
