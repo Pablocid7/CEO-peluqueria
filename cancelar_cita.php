@@ -14,7 +14,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['reserva_id'])) {
         die("Error de conexión: " . $mysqli->connect_error);
     }
 
-    // Asegurarse de que la cita pertenece al usuario
     $stmt = $mysqli->prepare("DELETE FROM reservas WHERE id = ? AND usuario_id = ?");
     $stmt->bind_param("ii", $reserva_id, $usuario_id);
     $stmt->execute();

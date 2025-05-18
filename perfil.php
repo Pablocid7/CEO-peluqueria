@@ -44,13 +44,12 @@ $mysqli->close();
     <p><strong>Nombre:</strong> <?= htmlspecialchars($usuario['nombre']) ?></p>
     <p><strong>Email:</strong> <?= htmlspecialchars($usuario['email']) ?></p>
     <p><strong>Teléfono:</strong> <?= htmlspecialchars($usuario['telefono']) ?></p>
-    <a href="editar_perfil.php" class="btn btn-primary mb-4">Editar</a>
 
     <div class="card">
         <div class="card-body">
             <h5 class="card-title">Próxima Cita</h5>
             <?php if ($proxima_cita): ?>
-                <p class="card-text">📅 <?= $proxima_cita['fecha'] ?> a las 🕒 <?= $proxima_cita['hora'] ?></p>
+                <p class="card-text">📅 <?= date('d-m-Y', strtotime($proxima_cita['fecha'])) ?> a las 🕒 <?= $proxima_cita['hora'] ?></p>
                 <p class="card-text">💇 Servicio: <?= htmlspecialchars($proxima_cita['servicio']) ?></p>
 
                 <form action="cancelar_cita.php" method="POST" onsubmit="return confirm('¿Estás seguro de que quieres cancelar tu cita?');">
@@ -61,6 +60,9 @@ $mysqli->close();
                 <p class="text-muted">No tienes ninguna cita agendada.</p>
             <?php endif; ?>
         </div>
+    </div>
+    <div class="mt-4">
+        <a href="index.php" class="btn btn-secondary">Volver a la página principal</a>
     </div>
 </div>
 </body>

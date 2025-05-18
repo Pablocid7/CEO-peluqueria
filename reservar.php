@@ -19,7 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $hora = $_POST['hora'];
     $usuario_id = isset($_SESSION['usuario_id']) ? $_SESSION['usuario_id'] : null;
 
-    // Primero comprobamos si ya existe una reserva para esa fecha y hora
+    // Comprobamos si ya existe una reserva para esa fecha y hora
     $stmt = $mysqli->prepare("SELECT id FROM reservas WHERE fecha = ? AND hora = ?");
     $stmt->bind_param("ss", $fecha, $hora);
     $stmt->execute();

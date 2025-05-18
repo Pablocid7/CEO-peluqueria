@@ -1,25 +1,115 @@
 <?php
 session_start();
+
+// Mostrar errores para depuración (quitar en producción)
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
+// Conexión a la base de datos
+$mysqli = new mysqli('localhost', 'root', '', 'peluqueria');
+if ($mysqli->connect_error) {
+  die("Error de conexión: " . $mysqli->connect_error);
+}
 ?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>BellaStyle</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Corte y Arte</title>
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
 
   <!-- Bootstrap 5.3 CDN -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+
+  <!-- AOS Animation -->
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet" />
 
   <style>
-    html {
-      scroll-behavior: smooth;
+    /* Tu CSS aquí (lo dejé igual que antes para no alargar) */
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #f7f7f7;
+      color: #3F3D56;
     }
-    .servicio img {
-      width: 100%;
-      max-width: 300px;
-      border-radius: 8px;
+    .navbar {
+      background-color: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(6px);
+    }
+    .navbar-brand {
+      font-weight: 700;
+      color: #3F3D56;
+    }
+    .nav-link {
+      color: #3F3D56;
+      font-weight: 500;
+    }
+    .nav-link:hover {
+      color: #5A6782;
+    }
+    header {
+      background-color: #3F3D56;
+      color: white;
+    }
+    .btn-primary,
+    .btn-outline-primary:hover {
+      background-color: #5A6782;
+      border-color: #5A6782;
+    }
+    .btn-outline-primary {
+      color: #5A6782;
+      border-color: #5A6782;
+    }
+    .hero {
+      background-image: url('imagenes/fondo-peluqueria.jpg');
+      background-size: cover;
+      background-position: center;
+      height: 100vh;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      color: white;
+    }
+    .hero::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.6);
+      z-index: 1;
+    }
+    .hero-content {
+      position: relative;
+      z-index: 2;
+    }
+    .card {
+      border: none;
+      border-radius: 15px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    }
+    footer {
+      background: #3F3D56;
+      color: white;
+    }
+    .form-control, .form-select {
+      border-radius: 10px;
+    }
+    .btn-success {
+      background-color: #3F3D56;
+      border-color: #3F3D56;
+    }
+    .btn-success:hover {
+      background-color: #2D2B3E;
+      border-color: #2D2B3E;
     }
   </style>
 </head>
@@ -39,23 +129,23 @@ session_start();
   <?php endif; ?>
 </div>
 
-<header class="p-5 text-white text-center" style="background: linear-gradient(90deg, #6a11cb 0%, #2575fc 100%)">
+<header class="p-5 text-white text-center">
   <div class="container">
     <h1 class="display-5 fw-bold">
       <?php
         if (isset($_SESSION['usuario_nombre'])) {
           echo "Bienvenido/a, " . htmlspecialchars($_SESSION['usuario_nombre']);
         } else {
-          echo "Peluquería BellaStyle";
+          echo "Peluquería Corte y Arte";
         }
       ?>
     </h1>
   </div>
 </header>
 
-<nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm sticky-top">
+<nav class="navbar navbar-expand-lg sticky-top shadow-sm">
   <div class="container">
-    <a class="navbar-brand fw-bold" href="#">BellaStyle</a>
+    <a class="navbar-brand" href="#">Corte y Arte</a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -64,6 +154,7 @@ session_start();
         <li class="nav-item"><a class="nav-link" href="#inicio">Inicio</a></li>
         <li class="nav-item"><a class="nav-link" href="#servicios">Servicios</a></li>
         <li class="nav-item"><a class="nav-link" href="#reservas">Reservas</a></li>
+        <li class="nav-item"><a class="nav-link" href="#valoraciones">Valoraciones</a></li>
         <li class="nav-item"><a class="nav-link" href="#contacto">Contacto</a></li>
         <?php if (isset($_SESSION['usuario_id'])): ?>
           <li class="nav-item"><a class="nav-link" href="perfil.php">Mi perfil</a></li>
@@ -77,79 +168,42 @@ session_start();
   </div>
 </nav>
 
-<main class="container my-5">
-  <section id="inicio" class="mb-5">
-    <h2 class="mb-3">Bienvenido a BellaStyle</h2>
-    <p class="lead">Tu espacio de belleza y cuidado personal. Reserva tu cita online de forma rápida y sencilla.</p>
-  </section>
+<section id="inicio" class="hero">
+  <div class="hero-content">
+    <h1 class="display-4 fw-bold mb-3">Bienvenido a Corte y Arte</h1>
+    <p class="lead mb-4">Donde la creatividad se convierte en corte</p>
+    <a href="#reservas" class="btn btn-outline-light btn-lg">Reservar cita</a>
+  </div>
+</section>
 
+<main class="container my-5">
   <section id="servicios" class="mb-5">
     <h2 class="mb-4 text-center">Nuestros Servicios</h2>
     <div class="row g-4">
-      <div class="col-md-3">
-        <div class="card h-100 shadow-sm border-0 rounded">
-          <img src="imagenes/corte.jpg" class="card-img-top" alt="Corte" style="border-radius: 10px;">
+      <?php
+        $servicios = [
+          ["Corte de pelo", "imagenes/corte.jpg", "Corte personalizado según tu estilo", "12€"],
+          ["Coloración", "imagenes/coloracion.jpg", "Elige el color que resalta tu personalidad", "30€"],
+          ["Barba", "imagenes/barba.jpg", "Recorte y diseño de barba a la perfección", "8€"],
+          ["Tratamiento capilar", "imagenes/tratamiento.jpg", "Tratamiento para rejuvenecer tu cabello", "20€"]
+        ];
+        foreach ($servicios as $s):
+      ?>
+      <div class="col-md-6 col-lg-3" data-aos="fade-up">
+        <div class="card h-100 shadow-sm border-0">
+          <img src="<?= $s[1] ?>" class="card-img-top" alt="<?= $s[0] ?>">
           <div class="card-body text-center">
-            <h5 class="card-title">Corte de pelo</h5>
-            <p class="card-text">Corte personalizado según tu estilo</p>
-            <p class="card-price">Precio: 12€</p>
-          </div>
-          <!-- Descripción detallada oculta por defecto -->
-          <div class="detalle">
-            <p>Un corte único que se adapta a tu estilo y personalidad. Usamos las mejores técnicas para lograr un acabado perfecto.</p>
+            <h5 class="card-title"><?= $s[0] ?></h5>
+            <p class="card-text"><?= $s[2] ?></p>
+            <p class="fw-bold text-primary"><?= $s[3] ?></p>
           </div>
         </div>
       </div>
-
-      <div class="col-md-3">
-        <div class="card h-100 shadow-sm border-0 rounded">
-          <img src="imagenes/coloracion.jpg" class="card-img-top" alt="Coloración" style="border-radius: 10px;">
-          <div class="card-body text-center">
-            <h5 class="card-title">Coloración</h5>
-            <p class="card-text">Elige el color que resalta tu personalidad</p>
-            <p class="card-price">Precio: 30€</p>
-          </div>
-          <!-- Descripción detallada oculta por defecto -->
-          <div class="detalle">
-            <p>Aplicamos técnicas avanzadas de coloración para lograr tonos brillantes y duraderos, cuidando siempre la salud de tu cabello.</p>
-          </div>
-        </div>
-      </div>
-
-      <div class="col-md-3">
-        <div class="card h-100 shadow-sm border-0 rounded">
-          <img src="imagenes/barba.jpg" class="card-img-top" alt="Barba" style="border-radius: 10px;">
-          <div class="card-body text-center">
-            <h5 class="card-title">Barba</h5>
-            <p class="card-text">Recorte y diseño de barba a la perfección</p>
-            <p class="card-price">Precio: 8€</p>
-          </div>
-          <!-- Descripción detallada oculta por defecto -->
-          <div class="detalle">
-            <p>Recorte y forma perfecta para que tu barba luzca impecable. Cuidamos cada detalle para que te sientas seguro y a la moda.</p>
-          </div>
-        </div>
-      </div>
-
-      <div class="col-md-3">
-        <div class="card h-100 shadow-sm border-0 rounded">
-          <img src="imagenes/tratamiento.jpg" class="card-img-top" alt="Tratamiento" style="border-radius: 10px;">
-          <div class="card-body text-center">
-            <h5 class="card-title">Tratamiento capilar</h5>
-            <p class="card-text">Tratamiento para rejuvenecer tu cabello</p>
-            <p class="card-price">Precio: 20€</p>
-          </div>
-          <!-- Descripción detallada oculta por defecto -->
-          <div class="detalle">
-            <p>Tratamientos especializados para revitalizar y fortalecer tu cabello, dándole brillo y salud con productos de alta calidad.</p>
-          </div>
-        </div>
-      </div>
+      <?php endforeach; ?>
     </div>
-</section>
-
-
-  <section id="reservas" class="mb-5">
+  </section>
+  
+<section id="reservas" class="mb-5 text-center">
   <h2 class="mb-4">Reservar cita</h2>
 
   <?php if (isset($_SESSION['usuario_id'])): ?>
@@ -160,7 +214,8 @@ session_start();
       </div>
       <div class="col-md-6">
         <label for="telefono" class="form-label">Teléfono:</label>
-        <input type="tel" class="form-control" name="telefono" id="telefono" required>
+        <input type="tel" class="form-control" name="telefono" id="telefono" required value="<?= htmlspecialchars($_SESSION['telefono']) ?>" readonly>
+
       </div>
       <div class="col-md-6">
         <label for="servicio" class="form-label">Servicio:</label>
@@ -200,30 +255,95 @@ session_start();
       </div>
     </form>
   <?php else: ?>
-    <div class="alert alert-warning text-center">
-      Debes <a href="login.php" class="alert-link">iniciar sesión</a> para reservar una cita.
+    <div>
+      Debes <a href="login.php">iniciar sesión</a> para reservar una cita.
     </div>
   <?php endif; ?>
 </section>
 
+<section id="valoraciones" class="mb-5" data-aos="fade-up">
+  <h2 class="mb-4 text-center">Valoraciones de clientes</h2>
 
-  <section id="contacto" class="mb-5">
+  <?php if (isset($_SESSION['usuario_id'])): ?>
+    <form action="guardar_valoracion.php" method="POST" class="mb-4">
+      <div class="mb-3">
+        <label for="puntuacion" class="form-label">Puntuación (1-5):</label>
+        <select name="puntuacion" id="puntuacion" class="form-select" required>
+          <option value="" selected disabled>Selecciona</option>
+          <?php for ($i = 1; $i <= 5; $i++): ?>
+            <option value="<?= $i ?>"><?= $i ?></option>
+          <?php endfor; ?>
+        </select>
+      </div>
+      <div class="mb-3">
+        <label for="comentario" class="form-label">Comentario:</label>
+        <textarea name="comentario" id="comentario" class="form-control" rows="3" required></textarea>
+      </div>
+      <button type="submit" class="btn btn-primary">Enviar valoración</button>
+    </form>
+  <?php else: ?>
+    <p class="text-center">Debes <a href="login.php">iniciar sesión</a> para dejar una valoración.</p>
+  <?php endif; ?>
+  <h3 class="mb-4 text-start">Últimas valoraciones</h3>
+  <?php
+  $query = "SELECT usuarios.nombre, valoraciones.comentario, valoraciones.puntuacion, valoraciones.fecha 
+            FROM valoraciones 
+            JOIN usuarios ON valoraciones.usuario_id = usuarios.id 
+            ORDER BY valoraciones.fecha DESC LIMIT 3";
+  $result = $mysqli->query($query);
+
+  if (!$result) {
+      echo "<p class='text-danger text-center'>Error al cargar las valoraciones: " . htmlspecialchars($mysqli->error) . "</p>";
+  } elseif ($result->num_rows > 0) {
+      while ($val = $result->fetch_assoc()) {
+          ?>
+          <div class="card mb-3 shadow-sm">
+            <div class="card-body">
+              <h5 class="card-title"><?= htmlspecialchars($val['nombre']) ?></h5>
+              <h6 class="card-subtitle mb-2 text-muted">Valoración: <?= intval($val['puntuacion']) ?>/5</h6>
+              <p class="card-text"><?= nl2br(htmlspecialchars($val['comentario'])) ?></p>
+              <small class="text-muted">Fecha: <?= date('d/m/Y', strtotime($val['fecha'])) ?></small>
+            </div>
+          </div>
+          <?php
+      }
+  } else {
+      echo "<p class='text-center'>No hay valoraciones todavía. ¡Sé el primero en dejar la tuya!</p>";
+  }
+  ?>
+  <div class="text-center mt-3">
+    <a href="valoraciones_todas.php" class="btn btn-outline-primary">Ver todas las valoraciones</a>
+  </div>
+</section>
+
+
+  <section id="contacto" class="mb-5" data-aos="fade-up">
     <h2 class="mb-3">Contacto</h2>
-    <p><strong>Dirección:</strong> Calle Belleza, 123 - Ciudad</p>
-    <p><strong>Horario:</strong> De lunes a viernes de 10:00 a 13:00 y de 16:00 a 19:00</p>
+    <p><strong>Dirección:</strong> Calle Mayor, 123 - Vila-real</p>
+    <p><strong>Horario:</strong> Lunes a viernes de 10:00h a 13:00h y de 16:00h a 19:00h</p>
     <p><strong>Teléfono:</strong> 900 123 456</p>
-    <p><strong>Email:</strong> contacto@bellastyle.com</p>
+    <p><strong>Email:</strong> contacto@corteyarte.com</p>
   </section>
 </main>
 
-<footer class="bg-light py-4 mt-auto">
-  <div class="container text-center">
-    <p class="mb-0">&copy; 2025 BellaStyle. Todos los derechos reservados.</p>
+<footer class="py-4 text-center">
+  <div class="container">
+    <p class="mb-0">&copy; <?= date('Y') ?> Peluquería Corte y Arte. Todos los derechos reservados.</p>
   </div>
 </footer>
 
-<!-- Scripts de Bootstrap 5 -->
+<!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<script src="script.js"></script>
+<!-- AOS JS -->
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script>
+  AOS.init();
+</script>
+<script src="script.js?v=1.0.1"></script>
 </body>
 </html>
+
+<?php
+// Cerrar conexión a la base de datos
+$mysqli->close();
+?>

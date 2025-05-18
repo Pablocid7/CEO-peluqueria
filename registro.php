@@ -31,6 +31,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             $_SESSION['usuario_id'] = $usuario_id;
             $_SESSION['email'] = $email;
             $_SESSION['usuario_nombre'] = $nombre;
+            $_SESSION['telefono']= $telefono;
 
             // Redirigir a index con sesión iniciada
             header("Location: index.php");
@@ -65,33 +66,36 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     <?php endif; ?>
 
     <form action="registro.php" method="POST">
-        <div class="mb-3">
-            <label for="nombre" class="form-label">Nombre:</label>
-            <input type="text" class="form-control" name="nombre" required>
-        </div>
+    <div class="mb-3">
+        <label for="nombre" class="form-label">Nombre:</label>
+        <input type="text" class="form-control" name="nombre" id="nombre" required>
+    </div>
 
-        <div class="mb-3">
-            <label for="telefono" class="form-label">Teléfono:</label>
-            <input type="tel" class="form-control" name="telefono" required>
-        </div>
+    <div class="mb-3">
+        <label for="telefono" class="form-label">Teléfono:</label>
+        <input type="tel" class="form-control" name="telefono" id="telefono" required>
+    </div>
 
-        <div class="mb-3">
-            <label for="email" class="form-label">Correo electrónico:</label>
-            <input type="email" class="form-control" name="email" required>
-        </div>
+    <div class="mb-3">
+        <label for="email" class="form-label">Correo electrónico:</label>
+        <input type="email" class="form-control" name="email" id="email" required>
+    </div>
 
-        <div class="mb-3">
-            <label for="password" class="form-label">Contraseña:</label>
-            <input type="password" class="form-control" name="password" required>
-        </div>
+    <div class="mb-3">
+        <label for="password" class="form-label">Contraseña:</label>
+        <input type="password" class="form-control" name="password" id="password" required>
+    </div>
 
-        <button type="submit" class="btn btn-primary w-100">Registrar</button>
+    <button type="submit" class="btn btn-primary w-100">Registrar</button>
     </form>
+
 
     <p class="mt-3 text-center">
         ¿Ya tienes cuenta? <a href="login.php">Inicia sesión</a>
     </p>
 </div>
+
+<script src="script.js?v=1.0.1"></script>
 
 </body>
 </html>
